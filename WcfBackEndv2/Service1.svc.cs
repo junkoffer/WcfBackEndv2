@@ -12,23 +12,26 @@ namespace WcfBackEndv2
     // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        public string GetData(int value)
+        public ServiceCasePost AddPost(int caseNr, ServiceCasePost serviceCasePost)
         {
-            return string.Format("You entered: {0}", value);
+            return new ServiceCasePost();
         }
 
-        public CompositeType GetDataUsingDataContract(CompositeType composite)
+        public ServiceCase CreateCase(ServiceCase serviceCase)
         {
-            if (composite == null)
-            {
-                throw new ArgumentNullException("composite");
-            }
-            if (composite.BoolValue)
-            {
-                composite.StringValue += "Suffix";
-            }
-            return composite;
+            return new ServiceCase();
         }
+
+        public List<ServiceCase> GetAllCases()
+        {
+            return new List<ServiceCase>();
+        }
+
+        public ServiceCase GetCase(int caseNr)
+        {
+            return new ServiceCase();
+        }
+
         public string RegisterNewServiceCase()
         {
             using (var context = new ApplicationDbContext())
@@ -36,13 +39,12 @@ namespace WcfBackEndv2
                 var nextCaseNr = context
                     .ServiceCases
                     .OrderByDescending(c => c.CaseNr)
-                    .FirstOrDefault()
-                    .CaseNr;
+                    .FirstOrDefault() ?? new ServiceCase();
 
                 var serviceCase = new ServiceCase()
                 {
                     Date = DateTime.Now,
-                    CaseNr = nextCaseNr + 1,
+                    CaseNr = nextCaseNr.CaseNr + 1,
                 };
                 context.Entry(serviceCase).State = System.Data.Entity.EntityState.Added;
                 context.SaveChanges();
