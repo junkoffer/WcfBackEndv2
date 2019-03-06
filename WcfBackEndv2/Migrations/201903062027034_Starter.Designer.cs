@@ -7,13 +7,13 @@ namespace WcfBackEndv2.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Start : IMigrationMetadata
+    public sealed partial class Starter : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Start));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Starter));
         
         string IMigrationMetadata.Id
         {
-            get { return "201903061947291_Start"; }
+            get { return "201903062027034_Starter"; }
         }
         
         string IMigrationMetadata.Source

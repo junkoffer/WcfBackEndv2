@@ -7,6 +7,7 @@ namespace WcfBackEndv2
     public class ApplicationDbContext : DbContext
     {
         public virtual DbSet<ServiceCase> ServiceCases { get; set; }
+
         public ApplicationDbContext() : base("name=ApplicationDbContext")
         {
             Configuration.LazyLoadingEnabled = false;
