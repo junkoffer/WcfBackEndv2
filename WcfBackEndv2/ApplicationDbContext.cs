@@ -6,9 +6,8 @@ namespace WcfBackEndv2
 
     public class ApplicationDbContext : DbContext
     {
-       public virtual DbSet<ServiceCase> ServiceCases { get; set; }
-        public ApplicationDbContext()
-            : base("name=ApplicationDbContext")
+        public virtual DbSet<ServiceCase> ServiceCases { get; set; }
+        public ApplicationDbContext() : base("name=ApplicationDbContext")
         {
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

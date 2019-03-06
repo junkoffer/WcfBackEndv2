@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+using System.Runtime.Serialization;
 
 namespace WcfBackEndv2
 {
+    [DataContract]
     public class ServiceCase
     {
-        [Key]
-        public int CaseNr { get; set; } // sätts automatiskt av webbservicen vid sparning 
+        public int Id { get; set; } // sätts automatiskt av webbservicen vid sparning 
 
-        public DateTime Date { get; set; } // sätts automatiskt av webbservicen vid sparning 
+        [DataMember]
+        public int CaseNr { get; internal set; } // sätts automatiskt av webbservicen vid sparning 
 
-        public int FlatNr { get; set; } // optional 
+        [DataMember]
+        public DateTime Date { get; internal set; } // sätts automatiskt av webbservicen vid sparning 
 
-        public string Name { get; set; } // optional 
+        [DataMember]
+        public int FlatNr { get; set; } // required 
 
-        public string ContactEmail { get; set; } // obligatory 
+        [DataMember]
+        public string Name { get; set; } // required 
 
+        [DataMember]
+        public string ContactEmail { get; set; } // optional 
+
+        [DataMember]
         public List<ServiceCasePost> Posts { get; set; }
     }
          

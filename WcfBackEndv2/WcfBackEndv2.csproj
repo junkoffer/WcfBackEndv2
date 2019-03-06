@@ -21,6 +21,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,14 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationDbContext.cs" />
-    <Compile Include="LandLordAPI.cs" />
-    <Compile Include="Migrations\201903041357542_Initial.cs" />
-    <Compile Include="Migrations\201903041357542_Initial.Designer.cs">
-      <DependentUpon>201903041357542_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201903041437122_ServiceCase.cs" />
-    <Compile Include="Migrations\201903041437122_ServiceCase.Designer.cs">
-      <DependentUpon>201903041437122_ServiceCase.cs</DependentUpon>
+    <Compile Include="Migrations\201903061425409_initial.cs" />
+    <Compile Include="Migrations\201903061425409_initial.Designer.cs">
+      <DependentUpon>201903061425409_initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Service1.svc.cs">
@@ -90,7 +86,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceCase.cs" />
     <Compile Include="ServiceCasePost.cs" />
-    <Compile Include="TennantAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -105,11 +100,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201903041357542_Initial.resx">
-      <DependentUpon>201903041357542_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201903041437122_ServiceCase.resx">
-      <DependentUpon>201903041437122_ServiceCase.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903061425409_initial.resx">
+      <DependentUpon>201903061425409_initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
