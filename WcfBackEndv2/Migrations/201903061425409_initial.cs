@@ -3,7 +3,7 @@ namespace WcfBackEndv2.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class ServiceCase : DbMigration
+    public partial class initial : DbMigration
     {
         public override void Up()
         {
@@ -11,13 +11,14 @@ namespace WcfBackEndv2.Migrations
                 "dbo.ServiceCases",
                 c => new
                     {
-                        CaseNr = c.Int(nullable: false, identity: true),
+                        Id = c.Int(nullable: false, identity: true),
+                        CaseNr = c.Int(nullable: false),
                         Date = c.DateTime(nullable: false),
                         FlatNr = c.Int(nullable: false),
                         Name = c.String(),
                         ContactEmail = c.String(),
                     })
-                .PrimaryKey(t => t.CaseNr);
+                .PrimaryKey(t => t.Id);
             
             CreateTable(
                 "dbo.ServiceCasePosts",
@@ -26,18 +27,18 @@ namespace WcfBackEndv2.Migrations
                         Id = c.Int(nullable: false, identity: true),
                         Date = c.DateTime(nullable: false),
                         Message = c.String(),
-                        ServiceCase_CaseNr = c.Int(),
+                        ServiceCase_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.ServiceCases", t => t.ServiceCase_CaseNr, cascadeDelete: true)
-                .Index(t => t.ServiceCase_CaseNr);
+                .ForeignKey("dbo.ServiceCases", t => t.ServiceCase_Id, cascadeDelete: true)
+                .Index(t => t.ServiceCase_Id);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.ServiceCasePosts", "ServiceCase_CaseNr", "dbo.ServiceCases");
-            DropIndex("dbo.ServiceCasePosts", new[] { "ServiceCase_CaseNr" });
+            DropForeignKey("dbo.ServiceCasePosts", "ServiceCase_Id", "dbo.ServiceCases");
+            DropIndex("dbo.ServiceCasePosts", new[] { "ServiceCase_Id" });
             DropTable("dbo.ServiceCasePosts");
             DropTable("dbo.ServiceCases");
         }
