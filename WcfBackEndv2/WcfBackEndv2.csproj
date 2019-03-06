@@ -76,9 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationDbContext.cs" />
-    <Compile Include="Migrations\201903061947291_Start.cs" />
-    <Compile Include="Migrations\201903061947291_Start.Designer.cs">
-      <DependentUpon>201903061947291_Start.cs</DependentUpon>
+    <Compile Include="Migrations\201903062027034_Starter.cs" />
+    <Compile Include="Migrations\201903062027034_Starter.Designer.cs">
+      <DependentUpon>201903062027034_Starter.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Service1.svc.cs">
@@ -102,8 +102,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201903061947291_Start.resx">
-      <DependentUpon>201903061947291_Start.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903062027034_Starter.resx">
+      <DependentUpon>201903062027034_Starter.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
