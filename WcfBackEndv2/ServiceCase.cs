@@ -7,6 +7,11 @@ namespace WcfBackEndv2
     [DataContract]
     public class ServiceCase
     {
+        public ServiceCase()
+        {
+            Posts = new List<ServiceCasePost>();
+        }
+
         public int Id { get; set; } // sätts automatiskt av webbservicen vid sparning 
 
         [DataMember]
@@ -27,6 +32,6 @@ namespace WcfBackEndv2
         [DataMember]
         public List<ServiceCasePost> Posts { get; set; }
     }
-         
-       
+
+
 }
