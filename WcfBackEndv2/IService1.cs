@@ -11,10 +11,6 @@ namespace WcfBackEndv2
     [ServiceContract]
     public interface IService1
     {
-
-        [OperationContract]
-        string RegisterNewServiceCase();
-
         [OperationContract]
         List<ServiceCase> GetAllCases();
 
