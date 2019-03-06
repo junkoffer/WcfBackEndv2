@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -12,44 +13,44 @@ namespace WcfBackEndv2
     // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        public ServiceCasePost AddPost(int caseNr, ServiceCasePost serviceCasePost)
-        {
-            return new ServiceCasePost();
-        }
-
         public ServiceCase CreateCase(ServiceCase serviceCase)
         {
-            return new ServiceCase();
-        }
 
-        public List<ServiceCase> GetAllCases()
-        {
-            return new List<ServiceCase>();
-        }
-
-        public ServiceCase GetCase(int caseNr)
-        {
-            return new ServiceCase();
-        }
-
-        public string RegisterNewServiceCase()
-        {
             using (var context = new ApplicationDbContext())
             {
                 var nextCaseNr = context
                     .ServiceCases
                     .OrderByDescending(c => c.CaseNr)
                     .FirstOrDefault() ?? new ServiceCase();
-
-                var serviceCase = new ServiceCase()
-                {
-                    Date = DateTime.Now,
-                    CaseNr = nextCaseNr.CaseNr + 1,
-                };
-                context.Entry(serviceCase).State = System.Data.Entity.EntityState.Added;
+                serviceCase.Date = DateTime.Now;
+                serviceCase.CaseNr = nextCaseNr.CaseNr + 1;
+                context.Entry(serviceCase).State = EntityState.Added;
                 context.SaveChanges();
-                return string.Format("Nytt ärende med id {0}).",
-                    serviceCase.CaseNr);
+            }
+            return serviceCase;
+        }
+
+
+        public ServiceCasePost AddPost(int caseNr, ServiceCasePost serviceCasePost)
+        {
+            return new ServiceCasePost();
+        }
+
+        public List<ServiceCase> GetAllCases()
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                return context.ServiceCases.ToList();
+            }
+        }
+
+        public ServiceCase GetCase(int caseNr)
+        {
+            using (var context = new ApplicationDbContext())
+            {
+                return context.ServiceCases
+                    .Where(serviceCase => serviceCase.CaseNr == caseNr)
+                    .FirstOrDefault() ?? new ServiceCase { Name = "Finns inte" };
             }
         }
     }
