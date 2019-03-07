@@ -39,13 +39,14 @@ namespace WcfBackEndv2
                     .Where(sc => sc.CaseNr == caseNr)
                     .FirstOrDefault();
 
-                // Spara bara serviceCasePost om det finns et case med nummer 
+                // Spara bara serviceCasePost om det finns ett case med ett nummer 
                 // som passar caseNr
                 if (serviceCase != null)
                 {
                     serviceCase.Posts.Add(serviceCasePost);
                     context.SaveChanges();
                 }
+                //TODO: else { // lägg till felmeddelande }
                 return serviceCasePost;
             }
         }
