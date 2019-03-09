@@ -9,22 +9,22 @@ using System.Text;
 
 namespace WcfBackEndv2
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service1" in code, svc and config file together.
-    // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
         public ServiceCase CreateCase(ServiceCase serviceCase)
         {
-
             using (var context = new ApplicationDbContext())
             {
                 var nextCaseNr = context
                     .ServiceCases
-                    .OrderByDescending(c => c.CaseNr)
+                    .OrderByDescending(sc => sc.CaseNr)
                     .FirstOrDefault() ?? new ServiceCase();
                 serviceCase.Date = DateTime.Now;
                 serviceCase.CaseNr = nextCaseNr.CaseNr + 1;
+
+                // lägg till serviceCase till context
                 context.Entry(serviceCase).State = EntityState.Added;
+                // och skicka ändringarna till databasen
                 context.SaveChanges();
             }
             return serviceCase;
@@ -33,13 +33,31 @@ namespace WcfBackEndv2
 
         public ServiceCasePost AddPost(int caseNr, ServiceCasePost serviceCasePost)
         {
-            return new ServiceCasePost();
+            using (var context = new ApplicationDbContext())
+            {
+                var serviceCase = context.ServiceCases
+                    .Where(sc => sc.CaseNr == caseNr)
+                    .FirstOrDefault();
+
+                // Spara bara serviceCasePost om det finns ett case med ett nummer 
+                // som passar caseNr
+                if (serviceCase != null)
+                {
+                    serviceCase.Posts.Add(serviceCasePost);
+                    context.SaveChanges();
+                }
+                //TODO: else { // lägg till felmeddelande }
+                return serviceCasePost;
+            }
         }
 
         public List<ServiceCase> GetAllCases()
         {
             using (var context = new ApplicationDbContext())
             {
+                // returnerar bara ServiceCases utan några ServiceCasePosts
+                // eftersom lazyloading är deaktiverat. Propertyn
+                // Posts behövs ju ändå inte i en lista över ServiceCases
                 return context.ServiceCases.ToList();
             }
         }
@@ -48,8 +66,30 @@ namespace WcfBackEndv2
         {
             using (var context = new ApplicationDbContext())
             {
+                // Här används eager loading för att hämta upp ServiceCasePosts
+                // Eager loading är att föredra (enligt nedanstående länk) framför
+                // lazy loading när man gör serialization.
+                //
+                // "Lazy loading and serialization don’t mix well, and if you 
+                // aren’t careful you can end up querying for your 
+                // entire database just because lazy loading is enabled."
+                // 
+                // Eftersom WCF bygger på att serialisera klasser till XML så 
+                // har jag stängt av det för ApplicationDbContext genom att 
+                // lägga till denna rad i konstruktorn:
+                //     Configuration.LazyLoadingEnabled = false;
+                //
+                // Läs mer på:
+                // https://docs.microsoft.com/en-us/ef/ef6/querying/related-data
+
                 return context.ServiceCases
+                    // Leta upp case utifrån caseNr
                     .Where(serviceCase => serviceCase.CaseNr == caseNr)
+                    // Inkludera alla ServiceCasePosts genom eager loading
+                    .Include(sc=>sc.Posts)
+                    // Ta den första posten ur träfflistan, och om ingen finns
+                    // och FirstOrDefault returnerar null så skapa ett nytt
+                    // ServiceCase-objekt med ett felmeddelande
                     .FirstOrDefault() ?? new ServiceCase { Name = "Finns inte" };
             }
         }

@@ -7,11 +7,15 @@ namespace WcfBackEndv2
     public class ApplicationDbContext : DbContext
     {
         public virtual DbSet<ServiceCase> ServiceCases { get; set; }
+
         public ApplicationDbContext() : base("name=ApplicationDbContext")
         {
+            Configuration.LazyLoadingEnabled = false;
         }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Properties<DateTime>().Configure(c => c.HasColumnType("datetime2"));
             modelBuilder.Entity<ServiceCase>()
                 .HasMany(c => c.Posts)
                 .WithOptional()
@@ -19,16 +23,5 @@ namespace WcfBackEndv2
 
             base.OnModelCreating(modelBuilder);
         }
-
-        // Add a DbSet for each entity type that you want to include in your model. For more information 
-        // on configuring and using a Code First model, see http://go.microsoft.com/fwlink/?LinkId=390109.
-
-        // public virtual DbSet<MyEntity> MyEntities { get; set; }
     }
-
-    //public class MyEntity
-    //{
-    //    public int Id { get; set; }
-    //    public string Name { get; set; }
-    //}
 }

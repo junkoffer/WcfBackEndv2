@@ -3,7 +3,7 @@ namespace WcfBackEndv2.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class initial : DbMigration
+    public partial class Starter : DbMigration
     {
         public override void Up()
         {
@@ -13,7 +13,7 @@ namespace WcfBackEndv2.Migrations
                     {
                         Id = c.Int(nullable: false, identity: true),
                         CaseNr = c.Int(nullable: false),
-                        Date = c.DateTime(nullable: false),
+                        Date = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         FlatNr = c.Int(nullable: false),
                         Name = c.String(),
                         ContactEmail = c.String(),
@@ -25,7 +25,7 @@ namespace WcfBackEndv2.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Date = c.DateTime(nullable: false),
+                        Date = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         Message = c.String(),
                         ServiceCase_Id = c.Int(),
                     })

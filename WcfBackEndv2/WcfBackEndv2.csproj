@@ -70,13 +70,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Service1.svc" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationDbContext.cs" />
-    <Compile Include="Migrations\201903061425409_initial.cs" />
-    <Compile Include="Migrations\201903061425409_initial.Designer.cs">
-      <DependentUpon>201903061425409_initial.cs</DependentUpon>
+    <Compile Include="Migrations\201903062027034_Starter.cs" />
+    <Compile Include="Migrations\201903062027034_Starter.Designer.cs">
+      <DependentUpon>201903062027034_Starter.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Service1.svc.cs">
@@ -100,8 +102,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201903061425409_initial.resx">
-      <DependentUpon>201903061425409_initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903062027034_Starter.resx">
+      <DependentUpon>201903062027034_Starter.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
