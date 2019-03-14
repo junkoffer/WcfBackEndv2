@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using WcfBackEndv2.MailKit;
 
 namespace WcfBackEndv2
 {
@@ -44,7 +46,18 @@ namespace WcfBackEndv2
                 if (serviceCase != null)
                 {
                     serviceCase.Posts.Add(serviceCasePost);
-                    context.SaveChanges();
+                    try
+                    {
+                        var a = context.SaveChanges();
+                        if (serviceCase.Posts.Count == 1)
+                        {
+                            SendMailSimple.SendRegistrationConfirmation(serviceCase);
+                        }
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        serviceCasePost.ApiError.Add("UnableToSave_ServiceCasePost");
+                    }
                 }
                 //TODO: else { // lägg till felmeddelande }
                 return serviceCasePost;
@@ -86,7 +99,7 @@ namespace WcfBackEndv2
                     // Leta upp case utifrån caseNr
                     .Where(serviceCase => serviceCase.CaseNr == caseNr)
                     // Inkludera alla ServiceCasePosts genom eager loading
-                    .Include(sc=>sc.Posts)
+                    .Include(sc => sc.Posts)
                     // Ta den första posten ur träfflistan, och om ingen finns
                     // och FirstOrDefault returnerar null så skapa ett nytt
                     // ServiceCase-objekt med ett felmeddelande
