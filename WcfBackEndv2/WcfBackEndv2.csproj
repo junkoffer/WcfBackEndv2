@@ -80,6 +80,10 @@
     <Compile Include="Migrations\201903062027034_Starter.Designer.cs">
       <DependentUpon>201903062027034_Starter.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201903141213479_PostProperties.cs" />
+    <Compile Include="Migrations\201903141213479_PostProperties.Designer.cs">
+      <DependentUpon>201903141213479_PostProperties.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Service1.svc.cs">
       <DependentUpon>Service1.svc</DependentUpon>
@@ -91,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="MailKit\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -104,6 +109,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201903062027034_Starter.resx">
       <DependentUpon>201903062027034_Starter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903141213479_PostProperties.resx">
+      <DependentUpon>201903141213479_PostProperties.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
