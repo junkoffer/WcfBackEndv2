@@ -35,7 +35,7 @@ namespace WcfBackEndv2
 
         public ServiceCasePost()
         {
-            ApiError = new List<string>();
+            ApiErrors = new List<string>();
         }
     }
 }

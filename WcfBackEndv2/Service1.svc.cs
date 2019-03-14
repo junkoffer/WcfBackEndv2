@@ -56,7 +56,7 @@ namespace WcfBackEndv2
                     }
                     catch (DbUpdateException ex)
                     {
-                        serviceCasePost.ApiError.Add("UnableToSave_ServiceCasePost");
+                        serviceCasePost.ApiErrors.Add("UnableToSave_ServiceCasePost");
                     }
                 }
                 //TODO: else { // lägg till felmeddelande }

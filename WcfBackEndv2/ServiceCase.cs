@@ -36,7 +36,7 @@ namespace WcfBackEndv2
         [DataMember]
         [NotMapped]
         // Enbart för API:et. Syns inte i databasen
-        public List<string> ApiError { get; set; } // obligatoriskt
+        public List<string> ApiErrors { get; set; } // obligatoriskt
 
         public ServiceCase()
         {
