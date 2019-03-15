@@ -5,14 +5,14 @@ namespace WcfBackEndv2.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<WcfBackEndv2.ApplicationDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<WcfBackEndv2.Model.ApplicationDbContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(WcfBackEndv2.ApplicationDbContext context)
+        protected override void Seed(WcfBackEndv2.Model.ApplicationDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 

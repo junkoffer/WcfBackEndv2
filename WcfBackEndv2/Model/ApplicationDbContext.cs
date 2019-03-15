@@ -1,8 +1,7 @@
-namespace WcfBackEndv2
+namespace WcfBackEndv2.Model
 {
     using System;
     using System.Data.Entity;
-    using System.Linq;
 
     public class ApplicationDbContext : DbContext
     {

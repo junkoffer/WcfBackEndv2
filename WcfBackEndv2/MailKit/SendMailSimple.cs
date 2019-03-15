@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
 using System.Configuration;
 using System.Linq;
-using System.Web;
-using MailKit.Net.Smtp;
-using MimeKit;
+using WcfBackEndv2.Model;
 
 namespace WcfBackEndv2.MailKit
 {
@@ -21,13 +19,42 @@ namespace WcfBackEndv2.MailKit
     {
         public static void SendRegistrationConfirmation(ServiceCase serviceCase)
         {
+            // om serviceCase är null så kan inget göras
+            if (serviceCase == null)
+            {
+                return;
+            }
             var subject = $"Ett seviceärende med ID [{serviceCase.CaseNr}] är skapat";
-            var messageText = $"Ett seviceärende med ID {serviceCase.CaseNr} har nu skapats åt dig.\n\n"
+            var messageText = $"Ett seviceärende med ID [{serviceCase.CaseNr}] har nu skapats åt dig.\n\n"
                 + "Det mottagna ärendet ser ut såhär:\n\n"
                 + $"namn: {serviceCase.Name}\nlägenhetsnummer: {serviceCase.FlatNr}\n"
                 + $"E-Post: {serviceCase.ContactEmail}\n\n"
                 + $"Meddelande:\n{serviceCase.Posts.FirstOrDefault().Message}";
+            SendMessage(messageText, subject, serviceCase.Name, serviceCase.ContactEmail);
+        }
 
+        public static void SendLastPostToTennant(ServiceCase serviceCase)
+        {
+            // om serviceCase är null så kan inget göras
+            if (serviceCase == null)
+            {
+                return;
+            }
+            // om inägget är markerat som privat så ska det inte skickas!
+            if (serviceCase.Posts.LastOrDefault().Private)
+            {
+                return;
+            }
+            // Finns ingen vettig e-postadress ska det heller ine skickas något!
+            if (InputValidator.ValidateRegex(InputValidator.RegexEmail, serviceCase.ContactEmail))
+            {
+                return;
+            }
+            var subject = $"Nytt inlägg i ditt serviceärende, nr. [{serviceCase.CaseNr}].";
+            var messageText = $"Det finns ett nytt inlägg i serviceärende nr. [{serviceCase.CaseNr}]:\n\n"
+                + $"Avsändare: {serviceCase.Posts.LastOrDefault().Name}\n"
+                //+ $"E-Post: {serviceCase.Posts.LastOrDefault().ContactEmail}\n\n"
+                + $"Meddelande:\n{serviceCase.Posts.LastOrDefault().Message}";
             SendMessage(messageText, subject, serviceCase.Name, serviceCase.ContactEmail);
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
-namespace WcfBackEndv2
+namespace WcfBackEndv2.Model
 {
     [DataContract]
     public class ServiceCase
@@ -36,11 +36,11 @@ namespace WcfBackEndv2
         [DataMember]
         [NotMapped]
         // Enbart för API:et. Syns inte i databasen
-        public List<string> ApiErrors { get; set; } // obligatoriskt
+        public List<string> Errors { get; set; } // obligatoriskt
 
         public ServiceCase()
         {
-            ApiErrors = new List<string>();
+            Errors = new List<string>();
             Posts = new List<ServiceCasePost>();
         }
     }

@@ -2,32 +2,78 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.ServiceModel;
-using System.ServiceModel.Web;
-using System.Text;
 using WcfBackEndv2.MailKit;
+using WcfBackEndv2.Model;
 
 namespace WcfBackEndv2
 {
     public class Service1 : IService1
     {
+        public enum ApiErrors
+        {
+            ServiceCaseWasNull,
+            ServiceCasePostWasNull,
+            NoMatchingServiceCaseFound,
+            InputValidationFailed
+        }
+
         public ServiceCase CreateCase(ServiceCase serviceCase)
         {
+            // Gör en nullcheck
+            if (serviceCase == null)
+            {
+                serviceCase = new ServiceCase();
+                serviceCase.Errors.Add(ApiErrors.ServiceCaseWasNull.ToString());
+                return serviceCase;
+            }
+
             using (var context = new ApplicationDbContext())
             {
-                var nextCaseNr = context
+                // Validera all indata och avbryt ifall det är något fel. 
+                // Alla dom där frågeteckena är för att hantera eventuella nullvärden 
+                // så att programmet inte krashar
+                // Läs mer på:
+                // https://msdn.microsoft.com/en-us/magazine/dn802602.aspx
+                // https://davefancher.com/2014/08/14/c-6-0-null-propagation-operator/
+                var validated = (serviceCase.Name?.ValidateMinMaxLength(2, 30) ?? false)
+                && serviceCase.FlatNr.ValidateMinMax(1000, 9999)
+                && (serviceCase.ContactEmail?.ValidateMinMaxLength(6, 40) ?? false)
+                && (serviceCase.ContactEmail?.ValidateRegex(InputValidator.RegexEmail) ?? false);
+                if (!validated)
+                {
+                    serviceCase.Errors.Add(ApiErrors.InputValidationFailed.ToString());
+                    return serviceCase;
+                }
+                // Ta reda på högsta befintliga CaseNr och lägg till 1
+                var previousCase = context
                     .ServiceCases
                     .OrderByDescending(sc => sc.CaseNr)
                     .FirstOrDefault() ?? new ServiceCase();
                 serviceCase.Date = DateTime.Now;
-                serviceCase.CaseNr = nextCaseNr.CaseNr + 1;
+                serviceCase.CaseNr = previousCase.CaseNr + 1;
 
                 // lägg till serviceCase till context
                 context.Entry(serviceCase).State = EntityState.Added;
                 // och skicka ändringarna till databasen
-                context.SaveChanges();
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (Exception ex)
+                             when (ex is DbUpdateException
+                             || ex is DbUpdateConcurrencyException
+                             || ex is DbEntityValidationException
+                             || ex is NotSupportedException
+                             || ex is ObjectDisposedException
+                             || ex is InvalidOperationException
+                             )
+                // Dessa är alla exceptions som  context.SaveChanges() kan kasta. Info hämtad ifrån:
+                // https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbcontext.savechanges?view=entity-framework-6.2.0
+                {
+                    serviceCase.Errors.Add($"Exception in CreateCase(): {ex.Message}");
+                }
             }
             return serviceCase;
         }
@@ -35,31 +81,83 @@ namespace WcfBackEndv2
 
         public ServiceCasePost AddPost(int caseNr, ServiceCasePost serviceCasePost)
         {
+            // Gör en nullcheck
+            if (serviceCasePost == null)
+            {
+                serviceCasePost = new ServiceCasePost();
+                serviceCasePost.Errors.Add(ApiErrors.ServiceCaseWasNull.ToString());
+                return serviceCasePost;
+            }
+            if (serviceCasePost.Errors == null)
+            {
+                serviceCasePost.Errors = new List<string>();
+            }
             using (var context = new ApplicationDbContext())
             {
+                // Kolla att det finns ett serviceärende med matchande nummer 
                 var serviceCase = context.ServiceCases
                     .Where(sc => sc.CaseNr == caseNr)
+                    .Include(sc => sc.Posts)
                     .FirstOrDefault();
+                if (serviceCase == null)
+                {
+                    serviceCasePost.Errors.Add(ApiErrors.NoMatchingServiceCaseFound.ToString());
+                    return serviceCasePost;
+                }
 
-                // Spara bara serviceCasePost om det finns ett case med ett nummer 
-                // som passar caseNr
-                if (serviceCase != null)
+                // Validera all indata och avbryt ifall det är något fel. 
+                // Alla dom där frågeteckena är för att hantera eventuella nullvärden 
+                // så att programmet inte krashar
+                // Läs mer på:
+                // https://msdn.microsoft.com/en-us/magazine/dn802602.aspx
+                // https://davefancher.com/2014/08/14/c-6-0-null-propagation-operator/
+                var validated = (serviceCasePost.Message?.ValidateMinMaxLength(1, 2000) ?? false)
+                    && (serviceCasePost.Name?.ValidateMinMaxLength(2, 30) ?? false);
+                if (serviceCasePost.ContactEmail != null && serviceCasePost.ContactEmail != "")
+                {
+                    validated = validated
+                        && (serviceCasePost.ContactEmail?.ValidateMinMaxLength(6, 40) ?? false)
+                        && (serviceCasePost.ContactEmail?.ValidateRegex(InputValidator.RegexEmail) ?? false);
+                }
+                if (!validated)
+                {
+                    serviceCasePost.Errors.Add(ApiErrors.InputValidationFailed.ToString());
+                    return serviceCasePost;
+                }
+
+                // Försök att spara
+                try
                 {
                     serviceCase.Posts.Add(serviceCasePost);
-                    try
+                    context.SaveChanges();
+                    // Om det bara finns ett inlägg så betyder det att caset precis har skapats, 
+                    // och det ska då skickas ut ett bekräftelsemejl.
+                    // i annat fall ska det skickas ut en kopia på inlägget till den som skapade ärendet
+                    // förutsatt att private-flaggan inte är satt.
+                    // Metoden SendLastPostToTennant kollar själv, och skickar inte något mejl
+                    // om private-flaggan är satt eller om det inte finns någon riktig mejladress.
+                    if (serviceCase.Posts.Count == 1)
                     {
-                        var a = context.SaveChanges();
-                        if (serviceCase.Posts.Count == 1)
-                        {
-                            SendMailSimple.SendRegistrationConfirmation(serviceCase);
-                        }
+                        SendMailSimple.SendRegistrationConfirmation(serviceCase);
                     }
-                    catch (DbUpdateException ex)
+                    else
                     {
-                        serviceCasePost.ApiErrors.Add("UnableToSave_ServiceCasePost");
+                        SendMailSimple.SendLastPostToTennant(serviceCase);
                     }
                 }
-                //TODO: else { // lägg till felmeddelande }
+                catch (Exception ex)
+                             when (ex is DbUpdateException
+                             || ex is DbUpdateConcurrencyException
+                             || ex is DbEntityValidationException
+                             || ex is NotSupportedException
+                             || ex is ObjectDisposedException
+                             || ex is InvalidOperationException
+                             )
+                // Dessa är alla exceptions som  context.SaveChanges() kan kasta. Info hämtad ifrån:
+                // https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbcontext.savechanges?view=entity-framework-6.2.0
+                {
+                    serviceCasePost.Errors.Add($"Exception in AddPost(): {ex.Message}");
+                }
                 return serviceCasePost;
             }
         }
@@ -95,15 +193,21 @@ namespace WcfBackEndv2
                 // Läs mer på:
                 // https://docs.microsoft.com/en-us/ef/ef6/querying/related-data
 
-                return context.ServiceCases
+                var serviceCase = context.ServiceCases
                     // Leta upp case utifrån caseNr
-                    .Where(serviceCase => serviceCase.CaseNr == caseNr)
+                    .Where(sCase => sCase.CaseNr == caseNr)
                     // Inkludera alla ServiceCasePosts genom eager loading
                     .Include(sc => sc.Posts)
                     // Ta den första posten ur träfflistan, och om ingen finns
                     // och FirstOrDefault returnerar null så skapa ett nytt
                     // ServiceCase-objekt med ett felmeddelande
-                    .FirstOrDefault() ?? new ServiceCase { Name = "Finns inte" };
+                    .FirstOrDefault();
+                if (serviceCase == null)
+                {
+                    serviceCase = new ServiceCase { Name = "Inget serviceärende funnet." };
+                    serviceCase.Errors.Add(ApiErrors.NoMatchingServiceCaseFound.ToString());
+                }
+                return serviceCase;
             }
         }
     }

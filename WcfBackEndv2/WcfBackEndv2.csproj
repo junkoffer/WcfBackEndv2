@@ -85,7 +85,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationDbContext.cs" />
+    <Compile Include="InputValidator.cs" />
+    <Compile Include="Migrations\201903150713055_Mig2.cs" />
+    <Compile Include="Migrations\201903150713055_Mig2.Designer.cs">
+      <DependentUpon>201903150713055_Mig2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903150753054_Mig3.cs" />
+    <Compile Include="Migrations\201903150753054_Mig3.Designer.cs">
+      <DependentUpon>201903150753054_Mig3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\ApplicationDbContext.cs" />
     <Compile Include="MailKit\SendMailSimple.cs" />
     <Compile Include="Migrations\201903062027034_Starter.cs" />
     <Compile Include="Migrations\201903062027034_Starter.Designer.cs">
@@ -101,8 +110,8 @@
     </Compile>
     <Compile Include="IService1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceCase.cs" />
-    <Compile Include="ServiceCasePost.cs" />
+    <Compile Include="Model\ServiceCase.cs" />
+    <Compile Include="Model\ServiceCasePost.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -122,6 +131,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201903141213479_PostProperties.resx">
       <DependentUpon>201903141213479_PostProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903150713055_Mig2.resx">
+      <DependentUpon>201903150713055_Mig2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903150753054_Mig3.resx">
+      <DependentUpon>201903150753054_Mig3.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

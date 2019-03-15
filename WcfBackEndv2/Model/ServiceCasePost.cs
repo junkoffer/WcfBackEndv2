@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Web;
 
-namespace WcfBackEndv2
+namespace WcfBackEndv2.Model
 {
     [DataContract]
     public class ServiceCasePost
@@ -20,9 +17,9 @@ namespace WcfBackEndv2
         public DateTime Date { get; internal set; } // sätts automatiskt av webbservicen vid sparning 
 
         [DataMember]
-        public string UserDisplayName { get; set; } // obligatoriskt
+        public string Name { get; set; } // obligatoriskt
         [DataMember]
-        public string UserEmail { get; set; } // obligatoriskt
+        public string ContactEmail { get; set; } // obligatoriskt
         [DataMember]
         public bool Private { get; set; } // obligatoriskt
         [DataMember]
@@ -30,12 +27,13 @@ namespace WcfBackEndv2
 
         [DataMember]
         [NotMapped]
-        // Enbart för API:et. Syns inte i databasen
-        public List<string> ApiErrors { get; set; } // obligatoriskt
+        // Enbart för API:et. Syns inte i databasen. 
+        // Webservicen använder denna för att meddela ev. fel till den som använder servicen.
+        public List<string> Errors { get; internal set; } 
 
         public ServiceCasePost()
         {
-            ApiErrors = new List<string>();
+            Errors = new List<string>();
         }
     }
 }
