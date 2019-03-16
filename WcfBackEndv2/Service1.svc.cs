@@ -32,7 +32,7 @@ namespace WcfBackEndv2
             using (var context = new ApplicationDbContext())
             {
                 // Validera all indata och avbryt ifall det är något fel. 
-                // Alla dom där frågeteckena är för att hantera eventuella nullvärden 
+                // Alla dom där frågetecknena är för att hantera eventuella nullvärden 
                 // så att programmet inte krashar
                 // Läs mer på:
                 // https://msdn.microsoft.com/en-us/magazine/dn802602.aspx
@@ -40,7 +40,7 @@ namespace WcfBackEndv2
                 var validated = (serviceCase.Name?.ValidateMinMaxLength(2, 30) ?? false)
                 && serviceCase.FlatNr.ValidateMinMax(1000, 9999)
                 && (serviceCase.ContactEmail?.ValidateMinMaxLength(6, 40) ?? false)
-                && (serviceCase.ContactEmail?.ValidateRegex(InputValidator.RegexEmail) ?? false);
+                && (serviceCase.ContactEmail?.ValidateEmail() ?? false);
                 if (!validated)
                 {
                     serviceCase.Errors.Add(ApiErrors.InputValidationFailed.ToString());
@@ -117,7 +117,7 @@ namespace WcfBackEndv2
                 {
                     validated = validated
                         && (serviceCasePost.ContactEmail?.ValidateMinMaxLength(6, 40) ?? false)
-                        && (serviceCasePost.ContactEmail?.ValidateRegex(InputValidator.RegexEmail) ?? false);
+                        && (serviceCasePost.ContactEmail?.ValidateEmail() ?? false);
                 }
                 if (!validated)
                 {
@@ -128,6 +128,7 @@ namespace WcfBackEndv2
                 // Försök att spara
                 try
                 {
+                    serviceCasePost.Date = DateTime.Now;
                     serviceCase.Posts.Add(serviceCasePost);
                     context.SaveChanges();
                     // Om det bara finns ett inlägg så betyder det att caset precis har skapats, 

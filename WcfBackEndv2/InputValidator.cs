@@ -10,14 +10,20 @@ namespace WcfBackEndv2
         {
             return (input.Length >= min) && (input.Length <= max);
         }
+
         public static bool ValidateMinMax(this int input, int min, int max)
         {
             return (input >= min) && (input <= max);
         }
+
         public static bool ValidateRegex(this string input, string regex)
         {
             var rgx = new Regex(regex);
             return rgx.IsMatch(input);
+        }
+        public static bool ValidateEmail(this string input)
+        {
+            return input?.ValidateRegex(InputValidator.RegexEmail) ?? false;
         }
     }
 }

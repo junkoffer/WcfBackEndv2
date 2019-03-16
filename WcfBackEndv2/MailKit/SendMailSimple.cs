@@ -17,12 +17,13 @@ namespace WcfBackEndv2.MailKit
     /// </summary>
     public class SendMailSimple
     {
-        public static void SendRegistrationConfirmation(ServiceCase serviceCase)
+        public static bool SendRegistrationConfirmation(ServiceCase serviceCase)
         {
-            // om serviceCase är null så kan inget göras
-            if (serviceCase == null)
+            // om inget meddelande finns, och ingen vettig e-postadress 
+            // så kan inget meddelande skickas
+            if (validateSendRequest(serviceCase))
             {
-                return;
+                return false;
             }
             var subject = $"Ett seviceärende med ID [{serviceCase.CaseNr}] är skapat";
             var messageText = $"Ett seviceärende med ID [{serviceCase.CaseNr}] har nu skapats åt dig.\n\n"
@@ -31,31 +32,36 @@ namespace WcfBackEndv2.MailKit
                 + $"E-Post: {serviceCase.ContactEmail}\n\n"
                 + $"Meddelande:\n{serviceCase.Posts.FirstOrDefault().Message}";
             SendMessage(messageText, subject, serviceCase.Name, serviceCase.ContactEmail);
+            return true;
         }
 
-        public static void SendLastPostToTennant(ServiceCase serviceCase)
+        public static bool SendLastPostToTennant(ServiceCase serviceCase)
         {
-            // om serviceCase är null så kan inget göras
-            if (serviceCase == null)
+            // om inget meddelande finns, och ingen vettig e-postadress 
+            // så kan inget meddelande skickas
+            // om inägget är markerat som privat så ska det heller inte skickas!
+            if (validateSendRequest(serviceCase) || serviceCase.Posts.LastOrDefault().Private)
             {
-                return;
-            }
-            // om inägget är markerat som privat så ska det inte skickas!
-            if (serviceCase.Posts.LastOrDefault().Private)
-            {
-                return;
-            }
-            // Finns ingen vettig e-postadress ska det heller ine skickas något!
-            if (InputValidator.ValidateRegex(InputValidator.RegexEmail, serviceCase.ContactEmail))
-            {
-                return;
+                return false;
             }
             var subject = $"Nytt inlägg i ditt serviceärende, nr. [{serviceCase.CaseNr}].";
             var messageText = $"Det finns ett nytt inlägg i serviceärende nr. [{serviceCase.CaseNr}]:\n\n"
-                + $"Avsändare: {serviceCase.Posts.LastOrDefault().Name}\n"
-                //+ $"E-Post: {serviceCase.Posts.LastOrDefault().ContactEmail}\n\n"
-                + $"Meddelande:\n{serviceCase.Posts.LastOrDefault().Message}";
+                + $"{serviceCase.Posts.LastOrDefault().Message}\n\n"
+                + $"--------------------------------------------------\n"
+                + $"THN-AB\n{serviceCase.Posts.LastOrDefault().Name}\n";
+            //+ $"E-Post: {serviceCase.Posts.LastOrDefault().ContactEmail}\n\n"
             SendMessage(messageText, subject, serviceCase.Name, serviceCase.ContactEmail);
+            return true;
+        }
+
+        private static bool validateSendRequest(ServiceCase serviceCase)
+        {
+            // om inget meddelande finns, och ingen vettig e-postadress 
+            // så kan inget meddelande skickas
+            return serviceCase == null
+                || serviceCase.Posts == null
+                || serviceCase.Posts.Count() == 0
+                || !InputValidator.ValidateEmail(serviceCase.ContactEmail);
         }
 
         private static void SendMessage(string messageText, string subject, string recieverName, string recieverMail)
