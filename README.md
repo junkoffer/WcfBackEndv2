@@ -10,7 +10,7 @@ När du har laddat ner repot så måste du göra detta innan du kör igång:
 - om du har kört denna solution lokalt tidigare så kan det bli problem med den gamla databasen. FIX: gör bara sähär:
   - Öppna filen `Web.config`
   - titta längst ner, under taggen &lt;connectionStrings&gt; 
-  - but ut `initial catalog=WcfBackEndv2e;` mot något annat namn, vad som helst (glöm inte semokolon på slutet).
+  - byt ut `initial catalog=WcfBackEndv2e;` mot något annat namn, vad som helst (glöm inte semokolon på slutet).
 
 ## 3: Skapa en databas
 - Gå till: Tools -> NuGet Package Manager -> Package Manager Console
