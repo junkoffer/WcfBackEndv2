@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
-namespace WcfBackEndv2
+namespace WcfBackEndv2.Model
 {
     [DataContract]
     public class ServiceCase
     {
-        public ServiceCase()
-        {
-            Posts = new List<ServiceCasePost>();
-        }
 
         public int Id { get; set; } // sätts automatiskt av webbservicen vid sparning 
 
@@ -35,5 +32,16 @@ namespace WcfBackEndv2
 
         [DataMember]
         public List<ServiceCasePost> Posts { get; set; }
+
+        [DataMember]
+        [NotMapped]
+        // Enbart för API:et. Syns inte i databasen
+        public List<string> Errors { get; set; } // obligatoriskt
+
+        public ServiceCase()
+        {
+            Errors = new List<string>();
+            Posts = new List<ServiceCasePost>();
+        }
     }
 }
